@@ -1,34 +1,69 @@
-var fairyI, fairy, star, starI;
+var fairy, fairyI, fairySound;
+var star, starI;
+var backgroundI;
 
+const Engine = Matter.Engine;
+const World = Matter.World;
+const Bodies = Matter.Bodies;
+const Body = Matter.Body;
 
 
 function preload(){
-fairyI = loadImage(images/fairy.png)  
-starI = loadImage(images/star.png)
+fairyI = loadAnimation("images/fairyImage1.png", "images/fairyImage2.png");  
+starI = loadImage("images/star.png");
+backgroundI = loadImage("images/starNight.png");
+fairySound = loadSound("sound/JoyMusic.mp3");
 }
 
 function setup() {
   createCanvas(800, 750);
-  fairy = createSprite(200,325,100,100);
-  star = createSprite(600,325,30,30);
+  fairySound.play();
+
+  fairy = createSprite(130,525);
+  fairy.addAnimation("fairyflying",fairyI);  
+  fairy.scale =0.25;
+
+  star = createSprite(650,30);
+  star.addImage(starI);
+  star.scale = 0.2;
   
+  engine = Engine.create();
+  world = engine.world;
+
+  starBody = Bodies.circle(650 , 30 , 5 , {restitution:0.5, isStatic:true});
+  World.add(world, starBody);
+  
+  Engine.run(engine);
 }
 
 
 function draw() {
-  background("black");
-fairyI.addImage(fairy);
-starI.addImage(star);
+  background(backgroundI);
 
-if (keyPressed("left")) {
-  fairy.velocityX = -4
-}
-if (keyPressed("right")) {
-  fairy.velocityX = 4
-}
-if (keyDown("down")) {
-  star.velocityY = 6
-}
+  star.x= starBody.position.x 
+  star.y= starBody.position.y 
+
+  console.log(star.y);
+
+  if(star.y > 470 && starBody.position.y > 470 ){
+    Matter.Body.setStatic(starBody,true);
+  }
+
 drawSprites();
 
+}
+
+function keyPressed() {
+
+  if(keyCode === RIGHT_ARROW){
+           fairy.x = fairy.x + 20;
+  }
+  
+        if(keyCode === LEFT_ARROW){
+           fairy.x = fairy.x - 20;
+  }
+
+  if (keyCode === DOWN_ARROW) {
+    Matter.Body.setStatic(starBody,false); 
+  }
 }
